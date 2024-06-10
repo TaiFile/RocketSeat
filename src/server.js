@@ -1,4 +1,5 @@
 import http from 'node:http'
+import {json} from './middlewares/json.js'
 // ComonnJS -> require
 
 // HTTP
@@ -28,21 +29,22 @@ import http from 'node:http'
 
 const users = []
 
-const server = http.createServer((request, response)=>{
+const server = http.createServer( async(request, response)=>{
     // através do request irei conseguir informações como (name, email, senha)
     // response = irei ganhar uma resposta para o (name, email, senha, etc)
     const {method, url} = request;
+    await json(request, response);
 
     if(method === 'GET' && url ==='/users'){
         return response
-        .setHeader('Contend-type', 'application/json')
         .end(JSON.stringify(users));
     }
     if(method === 'POST' && url === '/users'){
+        const {name, email} = request.body;
         users.push({
             id: 1,
-            name: 'Vitor Taira',
-            email: 'vitorttaira@outlook.com'
+            name,
+            email
         })
         return response.writeHead(201).end()
     }
