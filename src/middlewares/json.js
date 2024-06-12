@@ -8,5 +8,5 @@ export async function json(request, response){
     }catch{
         request.body = null
     }
-    request.setHeader('Contend-type', 'application/json')
+    response.setHeader('Content-Type', 'application/json');
 }

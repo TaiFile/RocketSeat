@@ -1,5 +1,7 @@
 import http from 'node:http'
 import {json} from './middlewares/json.js'
+import {Database} from './middlewares/database.js'
+import {randomUUID} from 'node:crypto' // UUID => Unique Universal ID
 // ComonnJS -> require
 
 // HTTP
@@ -26,7 +28,7 @@ import {json} from './middlewares/json.js'
 // mas como o dado pode ser interpretado
 
 // HTTP Status Code (simboliza se o que enviou foi sucesso/erro/etc)
-
+const database = new Database()
 const users = []
 
 const server = http.createServer( async(request, response)=>{
@@ -36,19 +38,22 @@ const server = http.createServer( async(request, response)=>{
     await json(request, response);
 
     if(method === 'GET' && url ==='/users'){
+        const users = database.select('users')
         return response
         .end(JSON.stringify(users));
     }
     if(method === 'POST' && url === '/users'){
         const {name, email} = request.body;
-        users.push({
-            id: 1,
+        const user = {
+            id: randomUUID(),
             name,
             email
-        })
+        }
+        database.insert('users', user)
+        database.persiste()
         return response.writeHead(201).end()
     }
     return response.writeHead(404).end('Not Found');
-})
+});
 
 server.listen(5000)
