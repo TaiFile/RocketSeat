@@ -1,7 +1,6 @@
 import http from 'node:http'
 import {json} from './middlewares/json.js'
-import {Database} from './middlewares/database.js'
-import {randomUUID} from 'node:crypto' // UUID => Unique Universal ID
+import {Routes} from './middlewares/routes.js'
 // ComonnJS -> require
 
 // HTTP
@@ -28,8 +27,6 @@ import {randomUUID} from 'node:crypto' // UUID => Unique Universal ID
 // mas como o dado pode ser interpretado
 
 // HTTP Status Code (simboliza se o que enviou foi sucesso/erro/etc)
-const database = new Database()
-const users = []
 
 const server = http.createServer( async(request, response)=>{
     // através do request irei conseguir informações como (name, email, senha)
@@ -37,21 +34,13 @@ const server = http.createServer( async(request, response)=>{
     const {method, url} = request;
     await json(request, response);
 
-    if(method === 'GET' && url ==='/users'){
-        const users = database.select('users')
-        return response
-        .end(JSON.stringify(users));
-    }
-    if(method === 'POST' && url === '/users'){
-        const {name, email} = request.body;
-        const user = {
-            id: randomUUID(),
-            name,
-            email
-        }
-        database.insert('users', user)
-        database.persiste()
-        return response.writeHead(201).end()
+    const route = Routes.find(route=>{
+        return route.method === method && route.path === url
+    })
+    if(route){
+        return route.handler(request, response)
+    }else{
+        console.log('Comand not found')
     }
     return response.writeHead(404).end('Not Found');
 });

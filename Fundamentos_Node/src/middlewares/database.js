@@ -18,7 +18,7 @@ export class Database{
     
     async persiste(){
         try{
-            fs.writeFile(databasePath, JSON.stringify(this.#database))
+            await fs.writeFile(databasePath, JSON.stringify(this.#database))
         }
         catch(error){
             console.log('Error persiste', error)
@@ -36,5 +36,17 @@ export class Database{
             this.#database[table] = [data]
         }
         return data;
+    }
+    delete(table, _id){
+        if (!Array.isArray(this.#database[table])) {
+            return false
+        }
+        const index = this.#database[table].findIndex(item => item.id === id);
+        if (index === -1) {
+            return false;
+        }
+        this.#database[table].splice(index, 1);
+        this.persiste()
+        return true
     }
 }
