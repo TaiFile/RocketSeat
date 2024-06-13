@@ -28,6 +28,15 @@ import {Routes} from './middlewares/routes.js'
 
 // HTTP Status Code (simboliza se o que enviou foi sucesso/erro/etc)
 
+//Query Parameters: URL Stateful, enviar informação que não são sensíveis
+//Route Parameters: Identificação de recurso
+//Request Body: Envio de informações de um formulário
+
+// localhost:5000/users?userID=(algum id) (Route Parameters)
+// GET localhost:5000/users/1 (Route Parameteres)
+// DELETE localhost:5000/users/1 (Route Parameteres)
+// POST localhost:5000/users (request body, não modifica o url, para segurança)
+
 const server = http.createServer( async(request, response)=>{
     // através do request irei conseguir informações como (name, email, senha)
     // response = irei ganhar uma resposta para o (name, email, senha, etc)
@@ -35,9 +44,12 @@ const server = http.createServer( async(request, response)=>{
     await json(request, response);
 
     const route = Routes.find(route=>{
-        return route.method === method && route.path === url
+        return route.method === method && route.path.test(url)
     })
     if(route){
+        const routeParams = request.url.match(route.path)
+        request.params ={...routeParams.groups}
+
         return route.handler(request, response)
     }else{
         console.log('Comand not found')

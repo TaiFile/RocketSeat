@@ -1,3 +1,4 @@
+import { buildRputePath } from '../utils/build-rout-path.js'
 import {Database} from './database.js'
 import {randomUUID} from 'node:crypto' // UUID => Unique Universal ID
 
@@ -5,7 +6,7 @@ const database = new Database()
 export const Routes = [
     {
         method : 'GET',
-        path: '/users',
+        path: buildRputePath('/users'),
         handler: (request, response) => {
             const users = database.select('users')
             return response
@@ -14,7 +15,7 @@ export const Routes = [
     },
     {
         method: 'POST',
-        path: '/users',
+        path: buildRputePath('/users'),
         handler: (request, response) => {
             const { name, email } = request.body;
             const user = {
@@ -29,12 +30,11 @@ export const Routes = [
     },
     {
         method: 'DELETE',
-        path: '/users/:id',  
+        path: buildRputePath('/users/:id'),  
         handler: async (request, response) => {
-            const userId = request.url.split('/')[2]; // Extrair o ID da URL
-            const result = await database.delete('users', userId);
-            response.writeHead(result ? 204 : 404, { 'Content-Type': 'application/json' });
-            return response.end();
+            const {id} = request.params
+            database.delete('users', id)
+            return response.writeHead(204).end()
         }
     }
 ]

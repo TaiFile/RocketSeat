@@ -16,9 +16,9 @@ export class Database{
         })
     }
     
-    async persiste(){
+    persiste(){
         try{
-            await fs.writeFile(databasePath, JSON.stringify(this.#database))
+            fs.writeFile(databasePath, JSON.stringify(this.#database))
         }
         catch(error){
             console.log('Error persiste', error)
@@ -37,16 +37,11 @@ export class Database{
         }
         return data;
     }
-    delete(table, _id){
-        if (!Array.isArray(this.#database[table])) {
-            return false
+    delete(table, id){
+        const rowIndex = this.#database[table].findIndex(row => row.id === id)
+        if(rowIndex > -1){
+            this.#database[table].splice(rowIndex,1)
+            this.persiste()
         }
-        const index = this.#database[table].findIndex(item => item.id === id);
-        if (index === -1) {
-            return false;
-        }
-        this.#database[table].splice(index, 1);
-        this.persiste()
-        return true
     }
 }
