@@ -36,5 +36,19 @@ export const Routes = [
             database.delete('users', id)
             return response.writeHead(204).end()
         }
+    },
+    {
+        method: 'PUT',
+        path: buildRputePath('/users/:id'),
+        handler: async (request, response) => {
+            const { name, email } = request.body
+            const {id} = request.params
+            database.update('users', id, {
+                name,
+                email,
+            }
+            )
+            return response.writeHead(204).end()
+        }
     }
 ]
