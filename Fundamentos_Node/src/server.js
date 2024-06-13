@@ -1,6 +1,7 @@
 import http from 'node:http'
 import {json} from './middlewares/json.js'
 import {Routes} from './middlewares/routes.js'
+import { extractQueryParams } from './utils/extract-query-params.js';
 // ComonnJS -> require
 
 // HTTP
@@ -48,7 +49,11 @@ const server = http.createServer( async(request, response)=>{
     })
     if(route){
         const routeParams = request.url.match(route.path)
-        request.params ={...routeParams.groups}
+        //request.params ={...routeParams.groups}
+        const {query, ...params} = routeParams.groups
+
+        request.params = params
+        request.query = query ? extractQueryParams(query) : {}
 
         return route.handler(request, response)
     }else{
