@@ -1,5 +1,5 @@
 import {knex as setupKnex} from 'knex'
-import { env } from './env'
+import { env } from './routes'
 
 
 export const config = {

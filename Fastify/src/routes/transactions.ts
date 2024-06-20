@@ -2,12 +2,17 @@ import fastify, { FastifyInstance } from "fastify";
 import z from 'zod'
 import {randomUUID } from "crypto";
 import { knex } from "../database";
-import { title } from "process";
-import { error } from "console";
 import { checkSectionIdExist } from "../middleware/check-sectionId-exist";
 
 // Cookies <-> formas de manter contexto entre requisições
 // No momento que você acessa o site, salva uma informação como ID no navegador
+
+// Testes unitários : unidade da sua aplicação (function)
+// Testes de integração: testa a integração entre duas partes da sua aplicação
+// e2e - ponta a ponta: testa a aplicação como um todo (simula um usuário)
+
+// Pirâmides de testes: E2E (não dependem de nenhuma tecnologia, arquitetura)
+// E2E -> demora muito pra executar em grandes aplicações
 
 export async function transactionsRoutes(app: FastifyInstance){
     app.get('/', 
@@ -43,7 +48,9 @@ export async function transactionsRoutes(app: FastifyInstance){
         }
         , async (request, response) =>{
         const sessionId = request.cookies.sessionId;
-        const summary = await knex('transactions').where('session_id',sessionId).sum('amount', {as : 'amount'}).first();
+        const summary = await knex('transactions')
+        .where('session_id',sessionId)
+        .sum('amount', {as : 'amount'}).first();
 
         return summary;
     })
